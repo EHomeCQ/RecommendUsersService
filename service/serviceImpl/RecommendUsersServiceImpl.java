@@ -9,11 +9,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import cn.edu.bjtu.weibo.dao.UserDAO;
 import cn.edu.bjtu.weibo.dao.daoImpl.UserDaoImpl;
 import cn.edu.bjtu.weibo.model.*;
 import cn.edu.bjtu.weibo.service.RecommendUsersService;
 
-//@Service
+//@service("recommendUsersService")
 
 public class RecommendUsersServiceImpl implements RecommendUsersService {
 
@@ -23,7 +24,8 @@ public class RecommendUsersServiceImpl implements RecommendUsersService {
 
 	public List<String> recommand_id;
 
-	public UserDaoImpl Daoimp;
+	//@Autowired
+	private UserDAO userDAO;
 
 	private static Map<String, Integer> temp;
 
@@ -31,14 +33,14 @@ public class RecommendUsersServiceImpl implements RecommendUsersService {
 
 		user = new ArrayList<User>();
 		recommand_id = new ArrayList<String>();
-		Daoimp = new UserDaoImpl();
+		//userDAO = new UserDaoImpl();
 		temp = new HashMap<String, Integer>();
 	}
 
 	public void getFriendsSimilarity(String userId, int pageIndex,
 			int numberPerPage) {
 
-		List<String> Myfriends = Daoimp.getFollowers(userId, pageIndex,
+		List<String> Myfriends = userDAO.getFollowers(userId, pageIndex,
 				numberPerPage); // 返回一个UserID的List
 
 		if (!Myfriends.isEmpty()) {
@@ -48,7 +50,7 @@ public class RecommendUsersServiceImpl implements RecommendUsersService {
 				// 关注用户的权重
 				int i = 1;
 
-				List<String> Hisfriends = Daoimp.getFollowers(f, 1, 500);
+				List<String> Hisfriends = userDAO.getFollowers(f, 1, 500);
 
 				// 计算相关值
 				for (String m : Hisfriends) {// 遍历Hisfriends
@@ -139,23 +141,23 @@ public class RecommendUsersServiceImpl implements RecommendUsersService {
 			User re = new User();
 
 			// 设置用户属性
-			re.setName(Daoimp.getUserName(id));
+			re.setName(userDAO.getUserName(id));
 
-			re.setLocation(Daoimp.getLocation(id));
+			re.setLocation(userDAO.getLocation(id));
 
-			re.setBirthday(Daoimp.getBirthday(id));
+			re.setBirthday(userDAO.getBirthday(id));
 
-			re.setSex(Daoimp.getSex(id));
+			re.setSex(userDAO.getSex(id));
 
-			re.setAge(Daoimp.getUserAge(id));
+			re.setAge(userDAO.getUserAge(id));
 
-			re.setEducation(Daoimp.getUserEducation(id));
+			re.setEducation(userDAO.getUserEducation(id));
 
-			re.setPhone(Daoimp.getUserPhoneNumber(id));
+			re.setPhone(userDAO.getUserPhoneNumber(id));
 
-			re.setQq(Daoimp.getUserQQ(id));
+			re.setQq(userDAO.getUserQQ(id));
 
-			re.setLastWeiboId(Daoimp.getLastWeiboId(id));
+			re.setLastWeiboId(userDAO.getLastWeiboId(id));
 
 			user.add(re);
 		}
