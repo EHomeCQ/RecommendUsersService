@@ -46,7 +46,7 @@ public class RecommendUsersServiceImpl implements RecommendUsersService {
 			for (String f : Myfriends) {
 
 				// 关注用户的权重
-				int i = 0;
+				int i = 1;
 
 				List<String> Hisfriends = Daoimp.getFollowers(f, 1, 500);
 
