@@ -52,9 +52,9 @@ public class RecommendUsersServiceImpl implements RecommendUsersService {
 
 				// 计算相关值
 				for (String m : Hisfriends) {// 遍历Hisfriends
-					if (Myfriends.contains(m) && m == userId) // 如果两个用户互相关注，权重更高
+					if (Myfriends.contains(m) && m.equals(userId)) // 如果两个用户互相关注，权重更高
 						i += 3;
-					else if (Myfriends.contains(m) && m != userId)
+					else if (Myfriends.contains(m) && !m .equals(userId) )
 						i += 1;
 				}
 
@@ -90,7 +90,7 @@ public class RecommendUsersServiceImpl implements RecommendUsersService {
 
 				String ReName = rec.getKey();
 				
-				if (!Myfriends.contains(ReName) && ReName != userId){
+				if (!Myfriends.contains(ReName) && !ReName .equals(userId) ){
 					recommand_id.add(ReName);
 					index++;
 				}
@@ -163,4 +163,3 @@ public class RecommendUsersServiceImpl implements RecommendUsersService {
 		return user;
 	}
 }
-
