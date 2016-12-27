@@ -1,152 +1,166 @@
-package serviceImpl;
+package cn.edu.bjtu.weibo.service.serviceImpl;
 
-import java.util.ArrayList;  
-import java.util.Collections;  
-import java.util.Comparator;  
-import java.util.HashMap;  
-import java.util.List;  
-import java.util.Map;  
-import java.util.Map.Entry;  
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
+import cn.edu.bjtu.weibo.dao.daoImpl.UserDaoImpl;
 import cn.edu.bjtu.weibo.model.*;
+import cn.edu.bjtu.weibo.service.RecommendUsersService;
 
+//@Service
 
+public class RecommendUsersServiceImpl implements RecommendUsersService {
 
-@Service
+	// åŸºäºç”¨æˆ·çš„ååŒè¿‡æ»¤æ¨èç®—æ³•
 
-public class RecommendUsersServiceImpl implements RecommendUsersService{
-
-	//»ùÓÚÓÃ»§µÄĞ­Í¬¹ıÂËÍÆ¼öËã·¨
-	
 	public List<User> user;
-	
+
 	public List<String> recommand_id;
-	
-	/*public UserDaoImpl Daoimp;
-	
-	
-	public RecommendUsersServiceImpl(){
-		
+
+	public UserDaoImpl Daoimp;
+
+	private static Map<String, Integer> temp;
+
+	public RecommendUsersServiceImpl() {
+
 		user = new ArrayList<User>();
-		recommand_id = new ArrayList<String>(); 
+		recommand_id = new ArrayList<String>();
 		Daoimp = new UserDaoImpl();
+		temp = new HashMap<String, Integer>();
 	}
-	
-	public  void getFriendsSimilarity(String userId, int pageIndex, int numberPerPage ){
-		
-		List<String> Myfriends = Daoimp.getFollowers(userId,pageIndex,numberPerPage);  //·µ»ØÒ»¸öUserIDµÄList
-		Map<String, Double> temp=new HashMap<String, Double>();
-		
-		if(!Myfriends.isEmpty())
-		{	
-		
-		for(String f:Myfriends){
-			
-			//Ìù½üÖµ
-			int i=100;
-			
-			List<String> Hisfriends = Daoimp.getFollowers(f,pageIndex,numberPerPage); 
-			
-			//¼ÆËãÏà¹ØÖµ
-			for (String m : Hisfriends) {//±éÀúHisfriends
-	            if (Myfriends.contains(m)&&m==userId) //Èç¹û´æÔÚÕâ¸öÓÃ»§
-	                i-=3;
-	            else if(Myfriends.contains(m)&&m!=userId)
-	            	i-=1;
-	        }
-			
-			double sim = getEuclidDistance(i);
-			
-			temp.put(f, sim);
-		}
-		
-		  Set<Entry<String, Double>> ks = temp.entrySet();
-	      List<Entry<String, Double>> lm = new ArrayList<Map.Entry<String, Double>>(
-	                ks);
-		
-		// ÅÅĞò  
-		Collections.sort(lm, new Comparator<Entry<String, Double>>() {  
-			
-			@Override
-			public int compare(Entry<String, Double> o1,
-					Entry<String, Double> o2) {
-				// TODO Auto-generated method stub
-				return (int) (o1.getValue()-o2.getValue());
-			}  
-		});  
-		
-		//ÍÆ¼öÓÃ»§
-		while(true){
-			int j=0;
-			Entry<String, Double> rec=lm.get(j);
-			
-			List<String> notexist = Daoimp.getFollowers(rec.getKey(),pageIndex,numberPerPage);
-			
-			for(String t:notexist){
-				if(!Myfriends.contains(t)&&t!=userId)
-					recommand_id.add(t);
+
+	public void getFriendsSimilarity(String userId, int pageIndex,
+			int numberPerPage) {
+
+		List<String> Myfriends = Daoimp.getFollowers(userId, pageIndex,
+				numberPerPage); // è¿”å›ä¸€ä¸ªUserIDçš„List
+
+		if (!Myfriends.isEmpty()) {
+
+			for (String f : Myfriends) {
+
+				// å…³æ³¨ç”¨æˆ·çš„æƒé‡
+				int i = 0;
+
+				List<String> Hisfriends = Daoimp.getFollowers(f, 1, 500);
+
+				// è®¡ç®—ç›¸å…³å€¼
+				for (String m : Hisfriends) {// éå†Hisfriends
+					if (Myfriends.contains(m) && m == userId) // å¦‚æœä¸¤ä¸ªç”¨æˆ·äº’ç›¸å…³æ³¨ï¼Œæƒé‡æ›´é«˜
+						i += 3;
+					else if (Myfriends.contains(m) && m != userId)
+						i += 1;
+				}
+
+				getChildFollowerWeight(i, Hisfriends);
+
 			}
+
+			Set<Entry<String, Integer>> ks = temp.entrySet();
+			List<Entry<String, Integer>> lm = new ArrayList<Map.Entry<String, Integer>>(
+					ks);
+
+			// æ’åº
+			Collections.sort(lm, new Comparator<Entry<String, Integer>>() {
+
+				@Override
+				public int compare(Entry<String, Integer> o1,
+						Entry<String, Integer> o2) {
+					// TODO Auto-generated method stub
+					if(o1.getValue() <o2.getValue())
+						return 1;
+					
+					return -1;
+				}
+			});
+
+			// æ¨èç”¨æˆ·
 			
-			if(!user.isEmpty())
-				break;
-			else if(j==lm.size()-1)
-				break;
-			
-			j++;
-		 }
+			int index=0;//å·²æ¨èç”¨æˆ·æ•°é‡
+			int j = 0;
+			while (true) {
+				
+				Entry<String, Integer> rec = lm.get(j);
+
+				String ReName = rec.getKey();
+				
+				if (!Myfriends.contains(ReName) && ReName != userId){
+					recommand_id.add(ReName);
+					index++;
+				}
+				if (index>5)
+					break;
+				else if (j >= lm.size() - 1)
+					break;
+
+				j++;
+			}
 		}
 	}
-	
-	
-	//»ñÈ¡Á½¸öÓÃ»§Ö®¼äµÄÅ·¼¸ÀïµÃ¾àÀë,¾àÀëÔ½Ğ¡Ô½ºÃ 
-	
-	public static double getEuclidDistance(int temp) {  
-		 double a = Math.pow(temp, 2);  
-		 double totalscore = Math.abs(a);  
-	     
-	     return Math.sqrt(totalscore);  
-	}  
-	*/
-  
-	@Override
+
+	// è·å–å¤‡é€‰æ¨èç”¨æˆ·çš„å…´è¶£åº¦
+
+	public static void getChildFollowerWeight(int weight,
+			List<String> Authorities) {
+		
+		for(String t : Authorities){
+			
+			if(temp.containsKey(t)){
+				
+				Integer m = temp.get(t)+weight*2;
+				
+				temp.put(t, m);
+			}
+			else{
+				Integer mm = (Integer)weight*2;
+				temp.put(t, mm);
+			}
+		}
+
+	}
+
 	public List<User> getRecommendUserList(String userId, int pageIndex,
 			int numberPerPage) {
 		// TODO Auto-generated method stub
-		
-		/*getFriendsSimilarity(userId,pageIndex,numberPerPage);
-		
-		if(recommand_id.isEmpty())
+
+		getFriendsSimilarity(userId, pageIndex, numberPerPage);
+
+		if (recommand_id.isEmpty())
 			return null;
-		
-		for(String id : recommand_id){
-			
+
+		for (String id : recommand_id) {
+
 			User re = new User();
-			
-			//ÉèÖÃÓÃ»§ÊôĞÔ
+
+			// è®¾ç½®ç”¨æˆ·å±æ€§
 			re.setName(Daoimp.getUserName(id));
-			
+
 			re.setLocation(Daoimp.getLocation(id));
-			
+
 			re.setBirthday(Daoimp.getBirthday(id));
-			
+
 			re.setSex(Daoimp.getSex(id));
-			
+
 			re.setAge(Daoimp.getUserAge(id));
-			
+
 			re.setEducation(Daoimp.getUserEducation(id));
-			
+
 			re.setPhone(Daoimp.getUserPhoneNumber(id));
-			
+
 			re.setQq(Daoimp.getUserQQ(id));
-			
+
 			re.setLastWeiboId(Daoimp.getLastWeiboId(id));
-			
-			
+
 			user.add(re);
 		}
-		
-		return user;*/
-		return null;
+
+		return user;
 	}
 }
+
