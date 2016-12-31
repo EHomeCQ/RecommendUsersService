@@ -14,7 +14,7 @@ import cn.edu.bjtu.weibo.dao.daoImpl.UserDaoImpl;
 import cn.edu.bjtu.weibo.model.*;
 import cn.edu.bjtu.weibo.service.RecommendUsersService;
 
-//@service("recommendUsersService")
+@service("recommendUsersService")
 
 public class RecommendUsersServiceImpl implements RecommendUsersService {
 
@@ -24,7 +24,7 @@ public class RecommendUsersServiceImpl implements RecommendUsersService {
 
 	public List<String> recommand_id;
 
-	//@Autowired
+	@Autowired
 	private UserDAO userDAO;
 
 	private static Map<String, Integer> temp;
