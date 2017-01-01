@@ -13,8 +13,9 @@ import cn.edu.bjtu.weibo.dao.UserDAO;
 import cn.edu.bjtu.weibo.dao.daoImpl.UserDaoImpl;
 import cn.edu.bjtu.weibo.model.*;
 import cn.edu.bjtu.weibo.service.RecommendUsersService;
+import org.springframework.aop.*;
 
-@service("recommendUsersService")
+@Service("recommendUsersService")
 
 public class RecommendUsersServiceImpl implements RecommendUsersService {
 
@@ -127,6 +128,7 @@ public class RecommendUsersServiceImpl implements RecommendUsersService {
 
 	}
 
+	@Override
 	public List<User> getRecommendUserList(String userId, int pageIndex,
 			int numberPerPage) {
 		// TODO Auto-generated method stub
@@ -163,5 +165,11 @@ public class RecommendUsersServiceImpl implements RecommendUsersService {
 		}
 
 		return user;
+	}
+
+	@Override
+	public void updateRecommendResult() {
+		// TODO Auto-generated method stub
+		
 	}
 }
