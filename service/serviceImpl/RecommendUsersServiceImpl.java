@@ -24,11 +24,13 @@ public class RecommendUsersServiceImpl implements RecommendUsersService {
 	public List<User> user;
 
 	public List<String> recommand_id;
+	
+	private static Map<String, Integer> temp;
 
 	@Autowired
 	private UserDAO userDAO;
 
-	private static Map<String, Integer> temp;
+	
 
 	public RecommendUsersServiceImpl() {
 
