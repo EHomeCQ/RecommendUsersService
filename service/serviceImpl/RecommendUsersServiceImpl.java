@@ -41,27 +41,50 @@ public class RecommendUsersServiceImpl implements RecommendUsersService {
 	public void getFriendsSimilarity(String userId, int pageIndex,
 			int numberPerPage) {
 
-		List<String> Myfriends = userDAO.getFollowers(userId, pageIndex,
+		List<String> Myfriends1 = userDAO.getFollowers(userId, pageIndex,
 				numberPerPage); // 返回一个UserID的List
+		List<String> Myfriends2 = userDAO.getFollowing(userId, pageIndex,
+				numberPerPage); // 返回一个UserID的List
+		
+		int Followers=0;
+		int Following=0;
+		
+		if(Myfriends1.size()>=Myfriends2.size()){
+			Followers=1;
+			Following=3;
+		}
+		else{
+			Followers=3;
+			Following=1;
+		}
+		
+		if (!Myfriends1.isEmpty()||!Myfriends2.isEmpty()) {
+			
+			
 
-		if (!Myfriends.isEmpty()) {
+			for (String f : Myfriends1) {
 
-			for (String f : Myfriends) {
+				// 粉丝的权重
+				int i = Followers;
 
-				// 关注用户的权重
-				int i = 1;
-
-				List<String> Hisfriends = userDAO.getFollowers(f, 1, 500);
+				List<String> Followersfriends = userDAO.getFollowing(f, 1, 500);
 
 				// 计算相关值
-				for (String m : Hisfriends) {// 遍历Hisfriends
-					if (Myfriends.contains(m) && m.equals(userId)) // 如果两个用户互相关注，权重更高
-						i += 3;
-					else if (Myfriends.contains(m) && !m .equals(userId) )
-						i += 1;
-				}
+				
+				getChildFollowerWeight(i, Followersfriends);
 
-				getChildFollowerWeight(i, Hisfriends);
+			}
+			
+			for (String f : Myfriends2) {
+
+				// 关注用户的权重
+				int i = Following;
+
+				List<String> Followingfriends = userDAO.getFollowing(f, 1, 500);
+
+				// 计算相关值
+				
+				getChildFollowerWeight(i, Followingfriends);
 
 			}
 
@@ -93,7 +116,7 @@ public class RecommendUsersServiceImpl implements RecommendUsersService {
 
 				String ReName = rec.getKey();
 				
-				if (!Myfriends.contains(ReName) && !ReName .equals(userId) ){
+				if (!Myfriends2.contains(ReName) && !ReName .equals(userId) ){
 					recommand_id.add(ReName);
 					index++;
 				}
